@@ -1,0 +1,9 @@
+---
+
+home: /etc/traefik
+image: traefik:v1.7
+domain: docker.local
+log_driver: journald
+acme: staging
+email: example@example.com
+logLevel: DEBUG

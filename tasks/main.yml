@@ -1,12 +1,110 @@
 ---
 
-- name: Install pip
-  package:
-    name: '{{ pip_package_name[ansible_os_family] }}'
-    state: present
+- name: Ensure docker was setup once on this host
+  include_role: name=yourlabs.roleonce
+  vars:
+    rolenames: [yourlabs.io/oss/yourlabs.docker]
 
-- name: Pip install
+- name: Install passlib library for ansible htpasswd module
   pip:
-    name: '{{ name }}'
+    name: passlib
     state: present
 
+- name: Fetch password_root if any
+  fetch:
+    src: /root/password_root
+    dest: password_root
+    flat: true
+  failed_when: false
+
+- name: Create /etc/traefik/htpasswd
+  with_items: ['', '/htpasswd']
+  file:
+    path: /etc/traefik{{ item }}
+    state: directory
+    owner: root
+    mode: 0755
+
+- name: Generate htpasswd file
+  htpasswd:
+    password: "{{ lookup('password', 'password_root chars=ascii_letters length=32') }}"
+    path: /etc/traefik/htpasswd/root
+    name: root
+
+- name: Generate /etc/traefik/traefik.toml
+  template:
+    src: traefik.toml
+    dest: /etc/traefik/traefik.toml
+    mode: 0644
+    owner: root
+
+- name: Create web network
+  docker_network:
+    name: web
+
+- name: Create traefik container
+  docker_container:
+    pull: true
+    restart: true
+    name: traefik
+    image: '{{ image }}'
+    published_ports: ['80:80', '443:443']
+    exposed_ports: 8080
+    restart_policy: always
+    log_driver: '{{ log_driver }}'
+    volumes:
+    - /etc/traefik/traefik.toml:/traefik.toml:ro
+    - /etc/traefik/htpasswd:/htpasswd:ro
+    - /etc/traefik/acme:/etc/traefik/acme:rw
+    - /var/run/docker.sock:/var/run/docker.sock:ro
+    networks:
+    - name: web
+    #v2
+    #--providers.docker
+    #--global.sendanonymoususage=false
+    command: >
+      --docker
+      --web
+    #  --logLevel=debug
+    #  --defaultentrypoints=http,https
+    #  --entryPoints='Name:http Address::80 Redirect.EntryPoint:https'
+    #  --entryPoints='Name:https Address::443 TLS'
+    #  {% if acme %}--acme
+    #  {% if acme == 'staging' %}--acme.caserver='https://acme-staging-v02.api.letsencrypt.org/directory'{% endif %}
+    #  --acme.httpchallenge
+    #  --acme.entrypoint=http
+    #  --acme.onhostrule=true
+    #  --acme.email={{ email }}
+    #  --acme.storage=/etc/traefik/acme/acme.json
+    #  --acme.tlsconfig=true
+    #  {% endif %}
+    labels:
+      traefik.enable: 'true'
+      traefik.frontend.rule: 'Host:traefik.{{ domain }}'
+      traefik.frontend.auth.basic.usersFile: '/htpasswd/root'
+      traefik.frontend.auth.basic.removeHeader: 'true'
+      traefik.port: '8080'
+
+- name: Upload password in /root/password_root
+  copy:
+    src: password_root
+    dest: /root/password_root
+    owner: root
+    mode: 0600
+
+- name: Remove local copy of password_root and htaccess
+  changed_when: false
+  file:
+    path: '{{ item }}'
+    state: absent
+  with_items:
+  - password_root
+  - ./.tmp_traefik_htaccess
+
+- name: Show traefik container logs
+  shell: docker logs --tail=30 traefik
+  changed_when: false
+
+- name: Show password to enter https://traefik.<domain> with user root
+  shell: cat /root/password_root
+  changed_when: false
