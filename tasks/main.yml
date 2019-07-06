@@ -3,7 +3,7 @@
 - name: Ensure docker was setup once on this host
   include_role: name=yourlabs.roleonce
   vars:
-    rolenames: [yourlabs.io/oss/yourlabs.docker]
+    rolenames: [yourlabs.docker]
 
 - name: Install passlib library for ansible htpasswd module
   pip:
