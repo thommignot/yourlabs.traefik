@@ -1,7 +1,7 @@
 debug = true
 
 logLevel = "{{ logLevel }}"
-defaultEntryPoints = ["https"]
+defaultEntryPoints = ["http", "https"]
 
 [entryPoints]
   [entryPoints.https]
@@ -44,8 +44,8 @@ caServer = "https://acme-staging-v02.api.letsencrypt.org/directory"
 caServer = "https://acme-v02.api.letsencrypt.org/directory"
 {% endif %}
   [acme.tlsChallenge]
-  #[acme.httpChallenge]
-  #entryPoint = "https"
+  [acme.httpChallenge]
+  entryPoint = "http"
 
 [frontend]
 rule = "Host:traefik.{{ domain }}"
