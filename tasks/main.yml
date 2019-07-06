@@ -83,6 +83,22 @@
   - password_root
   - ./.tmp_traefik_htaccess
 
+- name: Save facts for further runs
+  shell:
+    cmd: |
+      cat > /etc/ansible/facts.d/yourlabs_traefik.fact << EOF
+      #!/bin/sh
+      echo '{
+        "traefik_domain": "{{ domain }}",
+        "traefik_acme": "{{ acme }}",
+        "traefik_email": "{{ email }}",
+        "yourlabs_traefik": "installed"
+      }'
+      EOF
+
+- name: Make facts executable for Ansible
+  file: path=/etc/ansible/facts.d/yourlabs_traefik.fact mode=0755
+
 - name: Show traefik container logs
   shell: docker logs --tail=30 traefik
   changed_when: false
