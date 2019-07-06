@@ -2,8 +2,8 @@
 
 home: /etc/traefik
 image: traefik:v1.7
-domain: '{{ ansible_facts.ansible_local.get("yourlabs_traefik", {}).get("traefik_domain", "docker.local") }}'
-log_driver: journald
-acme: '{{ ansible_facts.ansible_local.get("yourlabs_traefik", {}).get("traefik_acme", "staging") }}'
-email: '{{ ansible_facts.ansible_local.get("yourlabs_traefik", {}).get("traefik_email", "example@example.com") }}'
 logLevel: DEBUG
+log_driver: journald
+url: '{{ ansible_facts.ansible_local.yourlabs_traefik.url|default("https://" + ansible_default_ipv4.address) }}'
+acme: '{{ ansible_facts.ansible_local.yourlabs_traefik.acme|default("staging") }}'
+email: '{{ ansible_facts.ansible_local.yourlabs_traefik.email|default("example@example.com") }}'

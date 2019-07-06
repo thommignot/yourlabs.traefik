@@ -48,5 +48,5 @@ caServer = "https://acme-v02.api.letsencrypt.org/directory"
   entryPoint = "http"
 
 [frontend]
-rule = "Host:traefik.{{ domain }}"
+rule = "Host:{{ url.split('/')[2] }}"
 entryPoint = "http"

@@ -1,9 +1,9 @@
 ---
 
 - name: Ensure docker was setup once on this host
-  include_role: name=yourlabs.roleonce
+  include_role: name=yourlabs.remember tasks_from=require_once
   vars:
-    rolenames: [yourlabs.docker]
+    rolename: yourlabs.docker
 
 - name: Install passlib library for ansible htpasswd module
   pip:
@@ -62,7 +62,7 @@
     command: --docker --web
     labels:
       traefik.enable: 'true'
-      traefik.frontend.rule: 'Host:traefik.{{ domain }}'
+      traefik.frontend.rule: 'Host:{{ url.split("/")[2] }}'
       traefik.frontend.auth.basic.usersFile: '/htpasswd/root'
       traefik.frontend.auth.basic.removeHeader: 'true'
       traefik.port: '8080'
@@ -83,26 +83,19 @@
   - password_root
   - ./.tmp_traefik_htaccess
 
-- name: Save facts for further runs
-  shell:
-    cmd: |
-      cat > /etc/ansible/facts.d/yourlabs_traefik.fact << EOF
-      #!/bin/sh
-      echo '{
-        "traefik_domain": "{{ domain }}",
-        "traefik_acme": "{{ acme }}",
-        "traefik_email": "{{ email }}",
-        "yourlabs_traefik": "installed"
-      }'
-      EOF
-
-- name: Make facts executable for Ansible
-  file: path=/etc/ansible/facts.d/yourlabs_traefik.fact mode=0755
+- name: Save facts for future executions
+  include_role: name=yourlabs.remember
+  vars:
+    rolename: yourlabs.traefik
+    varnames:
+    - email
+    - url
+    - acme
 
 - name: Show traefik container logs
   shell: docker logs --tail=30 traefik
   changed_when: false
 
-- name: Show password to enter https://traefik.<domain> with user root
+- name: Show password to enter <url> with user root
   shell: cat /root/password_root
   changed_when: false
