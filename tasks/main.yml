@@ -59,25 +59,7 @@
     - /var/run/docker.sock:/var/run/docker.sock:ro
     networks:
     - name: web
-    #v2
-    #--providers.docker
-    #--global.sendanonymoususage=false
-    command: >
-      --docker
-      --web
-    #  --logLevel=debug
-    #  --defaultentrypoints=http,https
-    #  --entryPoints='Name:http Address::80 Redirect.EntryPoint:https'
-    #  --entryPoints='Name:https Address::443 TLS'
-    #  {% if acme %}--acme
-    #  {% if acme == 'staging' %}--acme.caserver='https://acme-staging-v02.api.letsencrypt.org/directory'{% endif %}
-    #  --acme.httpchallenge
-    #  --acme.entrypoint=http
-    #  --acme.onhostrule=true
-    #  --acme.email={{ email }}
-    #  --acme.storage=/etc/traefik/acme/acme.json
-    #  --acme.tlsconfig=true
-    #  {% endif %}
+    command: --docker --web
     labels:
       traefik.enable: 'true'
       traefik.frontend.rule: 'Host:traefik.{{ domain }}'
