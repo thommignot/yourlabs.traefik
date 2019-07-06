@@ -10,3 +10,6 @@ Basic traefik role with sane defaults that you can apply with a one-liner:
 Note that the dashboard will be served in `https://traefik.<domain>`,
 protected by http basic auth with user "root" and password: shown by bigsudo at
 the end of role, and also available in /root/password_root
+
+Note that it should remember the vars that you pass on the CLI because it
+writes an ansible fact file.
