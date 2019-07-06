@@ -19,9 +19,9 @@ defaultEntryPoints = ["https"]
     #  "TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA256"
     #]
 
-  [http]
+  [entryPoint.http]
   address = ":80"
-    [http.redirect]
+    [entryPoint.http.redirect]
     entryPoint = "https"
 
 [retry]
