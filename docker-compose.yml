@@ -1,0 +1,28 @@
+version: '3.7'
+
+services:
+  traefik:
+    image: traefik:v1.7
+    container_name: traefik
+    restart: unless-stopped
+    ports:
+    - "80:80"
+    - "443:443"
+    expose:
+    - 8080
+    volumes:
+    - /etc/traefik/traefik.toml:/traefik.toml:ro
+    - /etc/traefik/htpasswd:/htpasswd:ro
+    - /etc/traefik/acme:/etc/traefik/acme:rw
+    - /var/run/docker.sock:/var/run/docker.sock:ro
+    networks:
+    - web
+    labels:
+    - "traefik.enable=true"
+    - "traefik.frontend.auth.basic.usersFile=/htpasswd/root"
+    - "traefik.frontend.auth.basic.removeHeader=true"
+    - "traefik.port=8080"
+
+networks:
+  web:
+    external: true

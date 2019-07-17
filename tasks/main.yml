@@ -1,9 +1,9 @@
 ---
+- include_role: name=yourlabs.remember
 
 - name: Ensure docker was setup once on this host
   include_role: name=yourlabs.remember tasks_from=require_once
-  vars:
-    rolename: yourlabs.docker
+  vars: {rolename: yourlabs.docker}
 
 - name: Install passlib library for ansible htpasswd module
   pip:
@@ -38,34 +38,22 @@
     mode: 0644
     owner: root
 
-- name: Create web network
-  docker_network:
-    name: web
+- name: Upload {{ home }}/docker-compose.yml
+  copy:
+    src: '{{ role_path }}/docker-compose.yml'
+    dest: '{{ home }}/docker-compose.yml'
 
-- name: Create traefik container
-  docker_container:
-    pull: true
-    restart: true
-    name: traefik
-    image: '{{ image }}'
-    published_ports: ['80:80', '443:443']
-    exposed_ports: 8080
-    restart_policy: always
-    log_driver: '{{ log_driver }}'
-    volumes:
-    - /etc/traefik/traefik.toml:/traefik.toml:ro
-    - /etc/traefik/htpasswd:/htpasswd:ro
-    - /etc/traefik/acme:/etc/traefik/acme:rw
-    - /var/run/docker.sock:/var/run/docker.sock:ro
-    networks:
-    - name: web
-    command: --docker --web
-    labels:
-      traefik.enable: 'true'
-      traefik.frontend.rule: 'Host:{{ url.split("/")[2] }}'
-      traefik.frontend.auth.basic.usersFile: '/htpasswd/root'
-      traefik.frontend.auth.basic.removeHeader: 'true'
-      traefik.port: '8080'
+- name: Generate {{ home }}/docker-compose.override.yml
+  template:
+    src: '{{ role_path }}/docker-compose.override.template.yml'
+    dest: '{{ home }}/docker-compose.override.yml'
+
+- name: Start {{ home }}/docker-compose.yml
+  docker_compose:
+    project_src: '{{ home }}'
+    restarted: yes
+    pull: yes
+    recreate: always
 
 - name: Upload password in /root/password_root
   copy:
@@ -83,19 +71,4 @@
   - password_root
   - ./.tmp_traefik_htaccess
 
-- name: Save facts for future executions
-  include_role: name=yourlabs.remember
-  vars:
-    rolename: yourlabs.traefik
-    varnames:
-    - email
-    - url
-    - acme
-
-- name: Show traefik container logs
-  shell: docker logs --tail=30 traefik
-  changed_when: false
-
-- name: Show password to enter <url> with user root
-  shell: cat /root/password_root
-  changed_when: false
+- include_tasks: check.yml

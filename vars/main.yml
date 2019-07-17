@@ -4,6 +4,26 @@ home: /etc/traefik
 image: traefik:v1.7
 logLevel: DEBUG
 log_driver: journald
-url: '{{ ansible_facts.ansible_local.yourlabs_traefik.url|default("https://" + ansible_default_ipv4.address) }}'
-acme: '{{ ansible_facts.ansible_local.yourlabs_traefik.acme|default("staging") }}'
-email: '{{ ansible_facts.ansible_local.yourlabs_traefik.email|default("example@example.com") }}'
+rolename: yourlabs.traefik
+rolevars:
+- name: url
+  question: |
+    What is full url you want to deploy your dashboard to ?
+    ie. https://traefik.example.com
+  default: https://traefik.{{ ansible_facts.ansible_local.get('yourlabs_fqdn', {}).get('fqdn', 'example.com') }}
+  regexp: 'https?://\w+\.[\w+.]+'
+
+- name: email
+  question: What email do you want to declare to letsencrypt ?
+  regexp: '[\w+.]+@[\w+.]+\.[\w+.]+'
+
+- name: acme
+  question: |
+    If you want to use the staging letsencrypt server for testing, type staging
+    Otherwise, type production
+  default: staging
+  choices:
+    staging: https://acme-staging.api.letsencrypt.org/directory
+    production: https://acme-v01.api.letsencrypt.org/directory
+    httponly: ''
+  regexp: 'staging|production|httponly'

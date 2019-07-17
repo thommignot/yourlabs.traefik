@@ -50,3 +50,6 @@ caServer = "https://acme-v02.api.letsencrypt.org/directory"
 [frontend]
 rule = "Host:{{ url.split('/')[2] }}"
 entryPoint = "http"
+
+[api]
+dashboard = true
