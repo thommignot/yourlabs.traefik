@@ -27,5 +27,5 @@
     changed_when: false
     register: password_root
 
-  - name: Dashboard {{ url.replace('//', '//root:' + password_root.stdout.strip() + '@' }}
+  - name: Dashboard {{ url.replace('//', '//root:' + password_root.stdout.strip() + '@') }}
     debug: msg=""
