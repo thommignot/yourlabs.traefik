@@ -21,8 +21,10 @@ defaultEntryPoints = ["http", "https"]
 
   [entryPoints.http]
   address = ":80"
+  {% if http_redirect %}
     [entryPoints.http.redirect]
     entryPoint = "https"
+  {% endif %}
 
 [retry]
 

@@ -27,3 +27,8 @@ rolevars:
     production: https://acme-v01.api.letsencrypt.org/directory
     httponly: ''
   regexp: 'staging|production|httponly'
+
+- name: http_redirect
+  question: Do you want to redirect all http to https by default ?
+  default: true
+  regexp: 'true|false'
