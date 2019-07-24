@@ -13,9 +13,11 @@
     delay: 1
     until: url_verify.failed == false
     changed_when: false
-    shell: curl -I {% if acme == 'staging' %} -k {% endif %} {{ test_url }}
+    shell: curl -I {% if url.startswith('https') and 'staging' in acme %} -k {% endif %} {{ test_url }}
 
-  - include_role: name=yourlabs.remember tasks_from=success
+  - include_role: name=yourlabs.remember
+    vars:
+      remember_extra: {state: success}
 
   always:
   - name: Show traefik container logs

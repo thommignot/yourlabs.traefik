@@ -4,18 +4,14 @@ home: /etc/traefik
 image: traefik:v1.7
 logLevel: DEBUG
 log_driver: journald
-rolename: yourlabs.traefik
-rolevars:
+remember_fact: yourlabs.traefik
+remember:
 - name: url
   question: |
     What is full url you want to deploy your dashboard to ?
     ie. https://traefik.example.com
-  default: https://traefik.{{ ansible_facts.ansible_local.get('yourlabs_fqdn', {}).get('fqdn', 'example.com') }}
+  default: https://traefik.{{ ansible_facts.ansible_local.get('yourlabs_fqdn', {}).get('fqdn', inventory_hostname) }}
   regexp: 'https?://\w+\.[\w+.]+'
-
-- name: email
-  question: What email do you want to declare to letsencrypt ?
-  regexp: '[\w+.]+@[\w+.]+\.[\w+.]+'
 
 - name: acme
   question: |
@@ -25,10 +21,15 @@ rolevars:
   choices:
     staging: https://acme-staging.api.letsencrypt.org/directory
     production: https://acme-v01.api.letsencrypt.org/directory
-    httponly: ''
-  regexp: 'staging|production|httponly'
+  when: url.startswith('https')
+
+- name: email
+  question: What email do you want to declare to letsencrypt ?
+  type: email
+  when: url.startswith('https')
 
 - name: http_redirect
   question: Do you want to redirect all http to https by default ?
   default: true
   regexp: 'true|false'
+  when: url.startswith('https')

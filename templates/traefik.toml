@@ -21,7 +21,7 @@ defaultEntryPoints = ["http", "https"]
 
   [entryPoints.http]
   address = ":80"
-  {% if http_redirect %}
+  {% if http_redirect|default(false) %}
     [entryPoints.http.redirect]
     entryPoint = "https"
   {% endif %}
@@ -34,20 +34,18 @@ watch = true
 exposedbydefault = false
 network = "web"
 
+{% if url.startswith('https') %}
 [acme]
 email = "{{ email }}"
 storage = "/etc/traefik/acme/acme.json"
 entryPoint = "https"
 onHostRule = true
 acmeLogging = true
-{% if acme == 'staging' %}
-caServer = "https://acme-staging-v02.api.letsencrypt.org/directory"
-{% else %}
-caServer = "https://acme-v02.api.letsencrypt.org/directory"
-{% endif %}
+caServer = "{{ acme }}"
   [acme.tlsChallenge]
   [acme.httpChallenge]
   entryPoint = "http"
+{% endif %}
 
 [frontend]
 rule = "Host:{{ url.split('/')[2] }}"

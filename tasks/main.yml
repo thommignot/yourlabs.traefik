@@ -1,9 +1,10 @@
 ---
+
 - include_role: name=yourlabs.remember
 
 - name: Ensure docker was setup once on this host
-  include_role: name=yourlabs.remember tasks_from=require_once
-  vars: {rolename: yourlabs.docker}
+  include_role: name=yourlabs.docker
+  when: ansible_facts['ansible_local']['yourlabs_docker']['state']|default('') != 'success'
 
 - name: Install passlib library for ansible htpasswd module
   pip:
@@ -47,6 +48,10 @@
   template:
     src: '{{ role_path }}/docker-compose.override.template.yml'
     dest: '{{ home }}/docker-compose.override.yml'
+
+- name: Create web network
+  docker_network:
+    name: web
 
 - name: Start {{ home }}/docker-compose.yml
   docker_compose:
