@@ -6,12 +6,18 @@ logLevel: DEBUG
 log_driver: journald
 remember_fact: yourlabs.traefik
 remember:
+- name: password
+  question: |
+    What password to protect the traefik dashboard with ?
+    If empty, a new password will be generated and stored in
+    /root/password_root.
+    For no password (localhost, LAN), type none
 - name: url
   question: |
     What is full url you want to deploy your dashboard to ?
     ie. https://traefik.example.com
   default: https://traefik.{{ ansible_facts.ansible_local.get('yourlabs_fqdn', {}).get('fqdn', inventory_hostname) }}
-  regexp: 'https?://\w+\.[\w+.]+'
+  regexp: 'https?://[\w.]+'
 
 - name: acme
   question: |

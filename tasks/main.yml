@@ -12,6 +12,7 @@
     state: present
 
 - name: Fetch password_root if any
+  when: password != 'none'
   fetch:
     src: /root/password_root
     dest: password_root
@@ -27,8 +28,9 @@
     mode: 0755
 
 - name: Generate htpasswd file
+  when: password != 'none'
   htpasswd:
-    password: "{{ lookup('password', 'password_root chars=ascii_letters length=32') }}"
+    password: "{{ password if password else lookup('password', 'password_root chars=ascii_letters length=32') }}"
     path: /etc/traefik/htpasswd/root
     name: root
 
@@ -61,6 +63,7 @@
     recreate: always
 
 - name: Upload password in /root/password_root
+  when: password != 'none'
   copy:
     src: password_root
     dest: /root/password_root

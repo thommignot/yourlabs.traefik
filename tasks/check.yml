@@ -24,10 +24,12 @@
     shell: docker logs --tail=30 traefik
     changed_when: false
 
-  - name: Get password to enter <url> with user root
-    shell: cat /root/password_root
-    changed_when: false
-    register: password_root
+  - block:
+    - name: Get password to enter <url> with user root
+      shell: cat /root/password_root
+      changed_when: false
+      register: password_root
 
-  - name: Dashboard {{ url.replace('//', '//root:' + password_root.stdout.strip() + '@') }}
-    debug: msg=""
+    - name: Dashboard URL {{ url.replace('//', '//root:' + password_root.stdout.strip() + '@') }}
+      debug: msg="If you have a password, it is shown here"
+    when: password != 'none'

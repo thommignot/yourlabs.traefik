@@ -19,8 +19,6 @@ services:
     - web
     labels:
     - "traefik.enable=true"
-    - "traefik.frontend.auth.basic.usersFile=/htpasswd/root"
-    - "traefik.frontend.auth.basic.removeHeader=true"
     - "traefik.port=8080"
 
 networks:

@@ -4,3 +4,4 @@ services:
   traefik:
     labels:
     - "traefik.frontend.rule=Host: {{ url.split("/")[2] }}"
+    {% if password != 'none' %}- "traefik.frontend.auth.basic.usersFile=/htpasswd/root"{% endif %}
