@@ -20,6 +20,8 @@ services:
     labels:
     - "traefik.enable=true"
     - "traefik.port=8080"
+    - "traefik.frontend.headers.SSLRedirect=true"
+    - "traefik.frontend.entryPoints=http,https"
 
 networks:
   web:

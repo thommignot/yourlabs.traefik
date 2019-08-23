@@ -21,10 +21,10 @@ defaultEntryPoints = ["http", "https"]
 
   [entryPoints.http]
   address = ":80"
-  {% if http_redirect|default(false) %}
+{% if http_redirect|default(false) %}
     [entryPoints.http.redirect]
     entryPoint = "https"
-  {% endif %}
+{% endif %}
 
 [retry]
 
@@ -42,9 +42,19 @@ entryPoint = "https"
 onHostRule = true
 acmeLogging = true
 caServer = "{{ acme }}"
+{% if dnsprovider %}
+  [acme.dnsChallenge]
+  provider = "{{ dnsprovider }}"
+  delayBeforeCheck = 0
+{% endif %}
   [acme.tlsChallenge]
   [acme.httpChallenge]
   entryPoint = "http"
+{% endif %}
+{% if dnsprovider %}
+[[acme.domains]]
+  main = "*.{{ url.split('/')[2] }}"
+  sans = ["{{ url.split('/')[2] }}"]
 {% endif %}
 
 [frontend]

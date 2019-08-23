@@ -2,6 +2,15 @@ version: '3.7'
 
 services:
   traefik:
+    environment:
+{% if cloudflare_api_email %}
+    - CF_API_EMAIL={{ cloudflare_api_email }}
+{% endif %}
+{% if cloudflare_api_key %}
+    - CF_API_KEY={{ cloudflare_api_key }}
+{% endif %}
     labels:
     - "traefik.frontend.rule=Host: {{ url.split("/")[2] }}"
-    {% if password != 'none' %}- "traefik.frontend.auth.basic.usersFile=/htpasswd/root"{% endif %}
+{% if password != 'none' %}
+    - "traefik.frontend.auth.basic.usersFile=/htpasswd/root"
+{% endif %}

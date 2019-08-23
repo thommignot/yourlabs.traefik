@@ -12,6 +12,7 @@ remember:
     If empty, a new password will be generated and stored in
     /root/password_root.
     For no password (localhost, LAN), type none
+
 - name: url
   question: |
     What is full url you want to deploy your dashboard to ?
@@ -35,7 +36,28 @@ remember:
   when: url.startswith('https')
 
 - name: http_redirect
-  question: Do you want to redirect all http to https by default ?
+  question: |
+    Do you want to redirect all HTTP traffic to HTTPS by default ?
+    WARNING there is a rate limit, so that should not be used for servers that
+    host many ephemeral deployments
   default: true
   regexp: 'true|false'
   when: url.startswith('https')
+
+- name: dnsprovider
+  question: |
+    Do you want to enable DNS-01 challenge to enable wildcard certificate on
+    {{ url }} ? If so, please choose your provider below, otherwise type none
+  default: none
+  choices:
+    cloudflare: cloudflare
+    none: false
+  when: url.startswith('https')
+
+- name: cloudflare_api_key
+  question: What is your cloudflare API key ?
+  when: dnsprovider == 'cloudflare'
+
+- name: cloudflare_api_email
+  question: What is your cloudflare API email ?
+  when: dnsprovider == 'cloudflare'
