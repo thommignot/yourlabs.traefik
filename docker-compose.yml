@@ -1,28 +1,58 @@
-version: '3.7'
-
-services:
-  traefik:
-    image: traefik:v1.7
-    container_name: traefik
-    restart: unless-stopped
-    ports:
-    - "80:80"
-    - "443:443"
-    expose:
-    - 8080
-    volumes:
-    - /etc/traefik/traefik.toml:/traefik.toml:ro
-    - /etc/traefik/htpasswd:/htpasswd:ro
-    - /etc/traefik/acme:/etc/traefik/acme:rw
-    - /var/run/docker.sock:/var/run/docker.sock:ro
-    networks:
-    - web
-    labels:
-    - "traefik.enable=true"
-    - "traefik.port=8080"
-    - "traefik.frontend.headers.SSLRedirect=true"
-    - "traefik.frontend.entryPoints=http,https"
+version: '3.3'
 
 networks:
   web:
     external: true
+
+services:
+  traefik:
+    image: traefik:v2.0.0
+    container_name: traefik
+    networks:
+    - web
+    command:
+    - --entrypoints.web.address=:80
+    - --entrypoints.websecure.address=:443
+    - --providers.docker
+    - --api
+{% if url.startswith('https') %}
+    - --certificatesresolvers.leresolver.acme.caserver={{ acme }}
+    - --certificatesresolvers.leresolver.acme.email={{ email }}
+    - --certificatesresolvers.leresolver.acme.storage=/etc/traefik/acme/acme.json
+    - --certificatesresolvers.leresolver.acme.tlschallenge=true
+{% endif %}
+    ports:
+    - '80:80'
+    - '443:443'
+    volumes:
+    - /var/run/docker.sock:/var/run/docker.sock:ro
+    - /etc/traefik/acme/:/etc/traefik/acme/
+    - /etc/traefik/htpasswd:/htpasswd:ro
+    labels:
+      # Dashboard
+    - traefik.http.routers.traefik.rule=Host(`{{ url.split("/")[2] }}`)
+    - traefik.http.routers.traefik.service=api@internal
+    - traefik.http.routers.traefik.tls.certresolver=leresolver
+    - traefik.http.routers.traefik.entrypoints=websecure
+    - traefik.http.routers.traefik.middlewares=authtraefik
+{% if password != 'none' %}
+    - traefik.http.middlewares.authtraefik.basicauth.usersFile=/htpasswd/root
+{% endif %}
+      # global redirect to https
+    - traefik.http.routers.http-catchall.rule=hostregexp(`{host:.+}`)
+    - traefik.http.routers.http-catchall.entrypoints=web
+    - traefik.http.routers.http-catchall.middlewares=redirect-to-https
+
+      # middleware redirect
+    - traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https
+
+# Dashboard (https://localhost:8080)
+# Route
+# Basic auth (login: user | password: password)
+# Let's Encrypt (https://whoami.docker.localhost/)
+# Global HTTP to HTTPS redirection (http://whoami.docker.localhost/)
+# Dashboard [api@internal]
+# Dashboard [api@internal] + Basic auth (login: user | password: password)
+# Dashboard [api@internal] + TLS (https://traefik.docker.localhost/)
+
+# touch acme.json; chmod 600 acme.json

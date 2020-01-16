@@ -26,8 +26,8 @@ remember:
     Otherwise, type production
   default: staging
   choices:
-    staging: https://acme-staging.api.letsencrypt.org/directory
-    production: https://acme-v01.api.letsencrypt.org/directory
+    staging: https://acme-staging-v02.api.letsencrypt.org/directory
+    production: https://acme-v02.api.letsencrypt.org/directory
   when: url.startswith('https')
 
 - name: email
@@ -41,7 +41,7 @@ remember:
     WARNING there is a rate limit, so that should not be used for servers that
     host many ephemeral deployments
   default: true
-  regexp: 'true|false'
+  type: bool
   when: url.startswith('https')
 
 - name: dnsprovider
