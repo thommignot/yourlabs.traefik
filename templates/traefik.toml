@@ -3,6 +3,10 @@ debug = true
 logLevel = "{{ logLevel }}"
 defaultEntryPoints = ["http", "https"]
 
+[http.middlewares]
+  [http.middlewares.test-retry.retry]
+     attempts = 4
+
 [entryPoints]
   [entryPoints.https]
   address = ":443"
@@ -25,8 +29,6 @@ defaultEntryPoints = ["http", "https"]
     [entryPoints.http.redirect]
     entryPoint = "https"
 {% endif %}
-
-[retry]
 
 [docker]
 endpoint = "unix:///var/run/docker.sock"
