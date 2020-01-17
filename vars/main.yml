@@ -20,6 +20,12 @@ remember:
   default: https://traefik.{{ ansible_facts.ansible_local.get('yourlabs_fqdn', {}).get('fqdn', inventory_hostname) }}
   regexp: 'https?://[\w.]+'
 
+- name: ip
+  question: |
+    Do you want to deploy on a custom IP ?
+    If unsure leave empty (to bind all ips) and press enter
+  default:
+
 - name: acme
   question: |
     If you want to use the staging letsencrypt server for testing, type staging

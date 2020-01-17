@@ -22,8 +22,8 @@ services:
     - --certificatesresolvers.leresolver.acme.tlschallenge=true
 {% endif %}
     ports:
-    - '80:80'
-    - '443:443'
+    - '{% if ip|default(False) %}{{ ip }}:{% endif %}80:80'
+    - '{% if ip|default(False) %}{{ ip }}:{% endif %}443:443'
     volumes:
     - /var/run/docker.sock:/var/run/docker.sock:ro
     - /etc/traefik/acme/:/etc/traefik/acme/
