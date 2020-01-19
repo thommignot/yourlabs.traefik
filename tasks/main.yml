@@ -1,5 +1,13 @@
 ---
 
+- name: Create /etc/traefik/htpasswd
+  with_items: ['', '/htpasswd']
+  file:
+    path: /etc/traefik{{ item }}
+    state: directory
+    owner: root
+    mode: 0755
+
 - include_role: name=yourlabs.remember
 
 - name: Ensure docker was setup once on this host
@@ -20,12 +28,12 @@
   failed_when: false
 
 - name: Create /etc/traefik/htpasswd
-  with_items: ['', '/htpasswd']
   file:
-    path: /etc/traefik{{ item }}
+    path: /etc/traefik/htpasswd
     state: directory
     owner: root
     mode: 0755
+    recurse: yes
 
 - name: Generate htpasswd file
   when: password != 'none'
@@ -33,14 +41,7 @@
     password: "{{ password if password else lookup('password', 'password_root chars=ascii_letters length=32') }}"
     path: /etc/traefik/htpasswd/root
     name: root
-#
-#- name: Generate /etc/traefik/traefik.toml
-#  template:
-#    src: traefik.toml
-#    dest: /etc/traefik/traefik.toml
-#    mode: 0644
-#    owner: root
-#
+
 - name: Upload {{ home }}/docker-compose.yml
   template:
     src: '{{ role_path }}/docker-compose.yml'

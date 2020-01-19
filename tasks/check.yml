@@ -1,5 +1,8 @@
 ---
 
+- include_role: name=yourlabs.remember
+  when: url is not defined
+
 - name: Set test id
   set_fact: test_id={{ ansible_date_time|to_uuid }}
 
@@ -11,9 +14,12 @@
     register: url_verify
     retries: '{{ timeout|default(60) }}'
     delay: 1
-    until: url_verify.failed == false
+    until: url_verify['status'] in (401, 200)
+    failed_when: url_verify['status'] not in (401, 200)
     changed_when: false
-    shell: curl -I {% if url.startswith('https') and 'staging' in acme %} -k {% endif %} {{ test_url }}
+    uri:
+      url: '{{ test_url }}'
+      validate_certs: "{{ test_url.startswith('https') and acme == 'production' }}"
 
   - include_role: name=yourlabs.remember
     vars:
