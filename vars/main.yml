@@ -1,7 +1,7 @@
 ---
 
 home: /etc/traefik
-image: traefik:v1.7
+image: traefik:v2.2
 logLevel: DEBUG
 log_driver: journald
 remember_fact: yourlabs.traefik
