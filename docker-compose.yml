@@ -14,6 +14,9 @@ services:
     - web
     command:
     - --entrypoints.web.address=:80
+{% if bind_ssh %}
+    - --entrypoints.ssh.address=:22
+{% endif %}
     - --providers.docker
     - --api
 {% if url.startswith('https') %}
@@ -26,6 +29,7 @@ services:
     ports:
     - '{% if ip|default(False) %}{{ ip }}:{% endif %}80:80'
     - '{% if ip|default(False) %}{{ ip }}:{% endif %}443:443'
+    - '{% if bind_ssh %}{% if ip|default(False) %}{{ ip }}:{% endif %}22:22{% endif %}'
     volumes:
     - /var/run/docker.sock:/var/run/docker.sock:ro
     - /etc/traefik/acme/:/etc/traefik/acme/

@@ -26,6 +26,14 @@ remember:
     If unsure leave empty (to bind all ips) and press enter
   default:
 
+- name: bind_ssh
+  question: |
+    Do you want traefik to bind port 22 ?
+    For gitea, gitlab, gogs, etc...
+    It will also create an ssh entrypoint.
+  default: false
+  type: bool
+
 - name: acme
   question: |
     If you want to use the staging letsencrypt server for testing, type staging
