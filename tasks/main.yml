@@ -35,6 +35,11 @@
     mode: 0755
     recurse: yes
 
+- name: Upload traefik.toml
+  template:
+    src: '{{ role_path }}/traefik.toml'
+    dest: '{{ home }}/traefik.toml'
+
 - name: Generate htpasswd file
   when: password != 'none'
   htpasswd:

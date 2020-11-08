@@ -1,0 +1,15 @@
+{% if url.startswith('https') %}
+[tls.options]
+  [tls.options.default]
+{% if http_redirect %}
+    sniStrict = true
+{% endif %}
+    minVersion = "VersionTLS12"
+    cipherSuites = [
+      "ECDHE_RSA_AES256_GCM_SHA384",
+      "ECDHE_RSA_AES128_GCM_SHA256",
+      "ECDHE-RSA-AES256-SHA",
+      "ECDHE-RSA-AES128-SHA",
+      "ECDHE-RSA-DES-CBC3-SHA",
+    ]
+{% endif %}
