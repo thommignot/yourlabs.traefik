@@ -14,6 +14,11 @@
   include_role: name=thommignot.docker
   when: ansible_facts['ansible_local']['thommignot_docker']['state']|default('') != 'success'
 
+- name: Ensure pip3 installes
+  package:
+    name: pip3
+    state: present
+
 - name: Install passlib library for ansible htpasswd module
   pip:
     name: passlib
