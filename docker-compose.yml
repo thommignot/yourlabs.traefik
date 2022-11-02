@@ -39,7 +39,7 @@ services:
     - '{% if ip|default(False) %}{{ ip }}:{% endif %}8081:8081'
 {% endif %}
     volumes:
-   - /var/run/docker.sock:/var/run/docker.sock:ro
+    - /var/run/docker.sock:/var/run/docker.sock:ro
     - /etc/traefik/acme/:/etc/traefik/acme/
     - /etc/traefik/htpasswd:/htpasswd:ro
     labels:
