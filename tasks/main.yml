@@ -16,7 +16,7 @@
 
 - name: Ensure pip3 installes
   package:
-    name: pip3
+    name: python3-pip
     state: present
 
 - name: Install passlib library for ansible htpasswd module
