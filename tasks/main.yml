@@ -11,7 +11,7 @@
 - include_role: name=yourlabs.remember
 
 - name: Ensure docker was setup once on this host
-  include_role: name=yourlabs.docker
+  include_role: name=thommignot.docker
   when: ansible_facts['ansible_local']['yourlabs_docker']['state']|default('') != 'success'
 
 - name: Install passlib library for ansible htpasswd module
