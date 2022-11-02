@@ -17,6 +17,9 @@ services:
 {% if bind_ssh %}
     - --entrypoints.ssh.address=:22
 {% endif %}
+{% if websockets %}
+    - --entrypoints.websocket.address=:8081
+{% endif %}
     - --providers.docker
     - --api
 {% if url.startswith('https') %}
@@ -32,8 +35,11 @@ services:
 {% if bind_ssh %}
     - '{% if ip|default(False) %}{{ ip }}:{% endif %}22:22'
 {% endif %}
+{% if websockets %}
+    - '{% if ip|default(False) %}{{ ip }}:{% endif %}8081:8081'
+{% endif %}
     volumes:
-    - /var/run/docker.sock:/var/run/docker.sock:ro
+   - /var/run/docker.sock:/var/run/docker.sock:ro
     - /etc/traefik/acme/:/etc/traefik/acme/
     - /etc/traefik/htpasswd:/htpasswd:ro
     labels:

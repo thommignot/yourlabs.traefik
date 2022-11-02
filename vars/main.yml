@@ -26,6 +26,13 @@ remember:
     If unsure leave empty (to bind all ips) and press enter
   default:
 
+- name: websockets
+  question: |
+    Do you want traefik to bind port 8081 ?
+    It will also create an websocket entrypoint.
+  default: false
+  type: bool
+
 - name: bind_ssh
   question: |
     Do you want traefik to bind port 22 ?
