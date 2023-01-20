@@ -24,6 +24,11 @@
     name: passlib
     state: present
 
+- name: Install pip docker-compose 1.29
+  pip:
+    name: docker-compose
+    state: present
+
 - name: Fetch password_root if any
   when: password != 'none'
   fetch:
